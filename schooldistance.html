@@ -1,0 +1,58 @@
+<style type="text/css"> 
+	<html> { height: 100% } 
+	<body> { height: 100%; margin: 5; padding: 5 } 
+	</style> 
+
+     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	 <script type="text/javascript">
+
+	var schools = ["La Salle primary School", "Diocesan Girls's School", "Diocesan Boys' School", "St. Paul's Co-educational College Primary School", "Maryknoll Convent School (Primary Section)", "Taoist Ching Chung Primary School", "HKRSS Tuen Mun Primary School", "Yan Chai Hospital Law Chan Chor Si Primary School", "Kowloon Tong Government Primary School", "Sha Tin Government Primary School"];
+
+	var service = new google.maps.DistanceMatrixService();
+	var output = "";
+
+	function calcDistance() {
+		document.getElementById("output").value = "";
+
+		var request = {
+			origins : [document.getElementById("text").value + ', Hong Kong'],
+			destinations : schools,
+			travelMode : google.maps.DirectionsTravelMode.WALKING
+		};
+
+		service.getDistanceMatrix(request, function(response, status) {
+			if ( status == google.maps.DirectionsStatus.OK ) {
+				var origins = response.originAddresses;
+				var destinations = response.destinationAddresses;
+
+				for (var i = 0; i < origins.length; i++) {
+					var results = response.rows[i].elements;
+					for (var j = 0; j < results.length; j++) {
+						var element = results[j];
+						var distance = element.distance.text;
+						var distanceValue = element.distance.value;
+						var duration = element.duration.text;
+						var from = origins[i];
+						var to = destinations[j];
+						if (distanceValue < document.getElementById("distance").value * 1000 ) document.getElementById("output").value += schools[j] + ", " + distance + "\n";
+					}
+				}
+
+			}
+			else {
+				// ignore any error
+			}
+		});
+
+	}
+
+</script>
+
+<br><H3>Input your address and find nearby primary schools</H3>
+<br>Home Address: <input id="text" type="text" value="Ho Man Tin Estate"/>
+<br>Only show schools within <input id="distance" type="text" value="10"/> KM
+<br><input id="text" type="button" onclick="calcDistance();" value="Submit" />
+
+<br>
+<br><textarea readonly id="output" rows="20" cols="100%"></textarea> 
+<br>*DISCLAIMER: This is a prototype that contains only 10 schools in database. We do not guarantee accuracy, completeness, timeliness or correct sequencing of the information
